@@ -609,6 +609,7 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 		SparkHttpServicePluginContext pluginContext = context.getPluginContext();
 		BatchPhaseSpec batchPhaseSpec = null;
 
+		//Get pipeline json from request
 		try {
 			config = GSON.fromJson(Bytes.toString(request.getContent()), ETLBatchConfig.class);
 			if (config == null) {
@@ -617,21 +618,11 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			throw new BadRequestException(String.format(
-					"A request body must be provided the pipeline json to run '%s'. " + "Error: %s",
-					 e2.getMessage()));
+					"A request body must be provided the pipeline json to run '%s'. " + "Error: %s", e2.getMessage()));
 		}
-		
-		 
-		 try {
-//			 java.nio.file.Path configFile = new File("/Users/miraj.godha/Downloads/cdap-sandbox-5.0.0/ETLBatchConfig.config").toPath();
-////			String etlBatchConfig = "ETLBatchConfig{engine=SPARK, schedule='0 * * * *', maxConcurrentRuns=1, postActions=[], actions=null} ETLConfig{description='Data Pipeline Application', stages=[ETLStage{name='table_ds_miraj', plugin=Plugin{name='Table', type='batchsource', properties={schema={\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}, name=SuperStoreSalesReturn}, artifact=ArtifactSelectorConfig{scope='SYSTEM', name='core-plugins', version='2.0.0'}}}, ETLStage{name='wrangler_miraj', plugin=Plugin{name='Wrangler', type='transform', properties={field=*, precondition=false, threshold=10, schema={\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}, workspaceId=2f40e5362febcdf0acc2786b73cc1823, directives=generate-uuid orderid}, artifact=ArtifactSelectorConfig{scope='SYSTEM', name='wrangler-transform', version='3.1.0'}}}, ETLStage{name='table_ds_otput_miraj', plugin=Plugin{name='Table', type='batchsink', properties={schema={\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}, name=miraj_ds1, schema.row.field=orderid}, artifact=ArtifactSelectorConfig{scope='SYSTEM', name='core-plugins', version='2.0.0'}}}], connections=[Connection{from='table_ds_miraj', to='wrangler_miraj', port='null', condition='null'}, Connection{from='wrangler_miraj', to='table_ds_otput_miraj', port='null', condition='null'}], resources=Resources{virtualCores=1, memoryMB=1024}, driverResources=Resources{virtualCores=1, memoryMB=1024}, clientResources=null, stageLoggingEnabled=true, processTimingEnabled=true, numOfRecordsPreview=100, properties={}, source=null, sinks=null, transforms=null}";
-//			try (BufferedReader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
-//				String etlBatchConfig = reader.readLine();
-//				config = GSON.fromJson(etlBatchConfig, ETLBatchConfig.class);
-//			} catch (IOException e2) {
-//				e2.printStackTrace();
-//				throw new IllegalArgumentException("Invalid pipeline json.");
-//			}
+
+		//create batch pahse spec from input json
+		try {
 
 			BatchPipelineSpec spec = new InteractivePipelineSpecGenerator<SparkHttpServicePluginContext>(pluginContext,
 					ImmutableSet.of(BatchSource.PLUGIN_TYPE),
@@ -669,226 +660,184 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 					"Problem in creating batchPhaseSpec from the given pipeline json '%s'. " + "Error: %s",
 					ex.getMessage()));
 		}
-		
 
 		/**
 		 * Set spark pipeline json
 		 */
-//		String json = "{\"phaseName\":\"phase-1\",\"phase\":{\"stagesByType\":{\"transform\":[{\"name\":\"wrangler_miraj\",\"plugin\":{\"type\":\"transform\",\"name\":\"Wrangler\",\"properties\":{\"field\":\"*\",\"precondition\":\"false\",\"threshold\":\"1\",\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"workspaceId\":\"2f40e5362febcdf0acc2786b73cc1823\",\"directives\":\"filter-rows-on condition-true orderid \\u003d\\u003d null || orderid \\u003d~ \\\"^s*$\\\"\\nuppercase body\"},\"artifact\":{\"name\":\"wrangler-transform\",\"version\":{\"version\":\"3.1.0\",\"major\":3,\"minor\":1,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{\"table_ds_miraj\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}},\"outputPorts\":{\"table_ds_otput_miraj\":{\"schema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}}},\"outputSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"errorSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[\"table_ds_miraj\"],\"outputs\":[\"table_ds_otput_miraj\"]}],\"batchsource\":[{\"name\":\"table_ds_miraj\",\"plugin\":{\"type\":\"batchsource\",\"name\":\"Table\",\"properties\":{\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"name\":\"SuperStoreSalesReturn\"},\"artifact\":{\"name\":\"core-plugins\",\"version\":{\"version\":\"2.0.0\",\"major\":2,\"minor\":0,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{},\"outputPorts\":{\"wrangler_miraj\":{\"schema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}}},\"outputSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[],\"outputs\":[\"wrangler_miraj\"]}],\"batchsink\":[{\"name\":\"table_ds_otput_miraj\",\"plugin\":{\"type\":\"batchsink\",\"name\":\"Table\",\"properties\":{\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"name\":\"miraj_ds1\",\"schema.row.field\":\"orderid\"},\"artifact\":{\"name\":\"core-plugins\",\"version\":{\"version\":\"2.0.0\",\"major\":2,\"minor\":0,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{\"wrangler_miraj\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}},\"outputPorts\":{},\"errorSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[\"wrangler_miraj\"],\"outputs\":[]}]},\"stagesByName\":{\"table_ds_miraj\":{\"name\":\"table_ds_miraj\",\"plugin\":{\"type\":\"batchsource\",\"name\":\"Table\",\"properties\":{\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"name\":\"SuperStoreSalesReturn\"},\"artifact\":{\"name\":\"core-plugins\",\"version\":{\"version\":\"2.0.0\",\"major\":2,\"minor\":0,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{},\"outputPorts\":{\"wrangler_miraj\":{\"schema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}}},\"outputSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[],\"outputs\":[\"wrangler_miraj\"]},\"wrangler_miraj\":{\"name\":\"wrangler_miraj\",\"plugin\":{\"type\":\"transform\",\"name\":\"Wrangler\",\"properties\":{\"field\":\"*\",\"precondition\":\"false\",\"threshold\":\"1\",\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"workspaceId\":\"2f40e5362febcdf0acc2786b73cc1823\",\"directives\":\"filter-rows-on condition-true orderid \\u003d\\u003d null || orderid \\u003d~ \\\"^s*$\\\"\\nuppercase body\"},\"artifact\":{\"name\":\"wrangler-transform\",\"version\":{\"version\":\"3.1.0\",\"major\":3,\"minor\":1,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{\"table_ds_miraj\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}},\"outputPorts\":{\"table_ds_otput_miraj\":{\"schema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}}},\"outputSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"errorSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[\"table_ds_miraj\"],\"outputs\":[\"table_ds_otput_miraj\"]},\"table_ds_otput_miraj\":{\"name\":\"table_ds_otput_miraj\",\"plugin\":{\"type\":\"batchsink\",\"name\":\"Table\",\"properties\":{\"schema\":\"{\\\"type\\\":\\\"record\\\",\\\"name\\\":\\\"etlSchemaBody\\\",\\\"fields\\\":[{\\\"name\\\":\\\"orderid\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]},{\\\"name\\\":\\\"status\\\",\\\"type\\\":[\\\"string\\\",\\\"null\\\"]}]}\",\"name\":\"miraj_ds1\",\"schema.row.field\":\"orderid\"},\"artifact\":{\"name\":\"core-plugins\",\"version\":{\"version\":\"2.0.0\",\"major\":2,\"minor\":0,\"fix\":0},\"scope\":\"SYSTEM\"}},\"inputSchemas\":{\"wrangler_miraj\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}},\"outputPorts\":{},\"errorSchema\":{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]},\"stageLoggingEnabled\":true,\"processTimingEnabled\":true,\"inputs\":[\"wrangler_miraj\"],\"outputs\":[]}},\"dag\":{\"nodes\":[\"table_ds_miraj\",\"wrangler_miraj\",\"table_ds_otput_miraj\"],\"sources\":[\"table_ds_miraj\"],\"sinks\":[\"table_ds_otput_miraj\"],\"outgoingConnections\":{\"map\":{\"table_ds_miraj\":[\"wrangler_miraj\"],\"wrangler_miraj\":[\"table_ds_otput_miraj\"]}},\"incomingConnections\":{\"map\":{\"wrangler_miraj\":[\"table_ds_miraj\"],\"table_ds_otput_miraj\":[\"wrangler_miraj\"]}}}},\"resources\":{\"virtualCores\":1,\"memoryMB\":1024},\"driverResources\":{\"virtualCores\":1,\"memoryMB\":1024},\"clientResources\":{\"virtualCores\":1,\"memoryMB\":1024},\"isStageLoggingEnabled\":true,\"isProcessTimingEnabled\":true,\"connectorDatasets\":{},\"pipelineProperties\":{},\"description\":\"Sources \\u0027table_ds_miraj\\u0027 to sinks \\u0027table_ds_otput_miraj\\u0027.\",\"numOfRecordsPreview\":100,\"isPipelineContainsCondition\":false}";
 		String json = GSON.toJson(batchPhaseSpec);
 		Map<String, String> properties = context.getSpecification().getProperties();
 		properties.put(Constants.PIPELINEID, json);
 
-/**		
-		try {
-			Map<String, String> properies = new HashMap<String, String>();
-			properies.put("schema",
-					"{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}");
-			properies.put("field", "*");
-			properies.put("directives", "generate-uuid orderid");
-			properies.put("threshold", "-1");
-			properies.put("precondition", "false");
-			Constructor<?> constructor = PluginProperties.class.getDeclaredConstructor(Map.class);
-			constructor.setAccessible(true);
-			PluginProperties instance = (PluginProperties) constructor.newInstance(properies);
-
-			pluginContext.usePlugin(Transform.PLUGIN_TYPE, "Wrangler", "wrangler_miraj", instance);
-
-//			pluginContext.newPluginInstance("wrangler_miraj");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
 		try {
 
-			pluginContext.usePlugin(BatchSource.PLUGIN_TYPE, "Table", "table_ds_miraj", PluginProperties.builder().add(
-					"schema",
-					"{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}")
-					.add("name", "SuperStoreSalesReturn").build());
-//			pluginContext.newPluginInstance("table_ds_miraj");
+			List cleanupFiles = new ArrayList<>();
+			List<Finisher> finishers = new ArrayList<>();
+			SparkConf sparkConf = context.getSparkContext().getConf();
+
+			BatchPhaseSpec phaseSpec = GSON.fromJson(properties.get(Constants.PIPELINEID), BatchPhaseSpec.class);
+
+			for (Map.Entry<String, String> pipelineProperty : phaseSpec.getPipelineProperties().entrySet()) {
+				sparkConf.set(pipelineProperty.getKey(), pipelineProperty.getValue());
+			}
+
+			MacroEvaluator evaluator = new DefaultMacroEvaluator(new BasicArguments(context.getRuntimeArguments()),
+					context.getLogicalStartTime(), context.getSecureStore(), context.getNamespace());
+			final SparkBatchSourceFactory sourceFactory = new SparkBatchSourceFactory();
+			final SparkBatchSinkFactory sinkFactory = new SparkBatchSinkFactory();
+			final Map<String, Integer> stagePartitions = new HashMap<>();
+			/**
+			 * PluginContext pluginContext = new
+			 * SparkPipelinePluginContext(context.getPluginContext(), context.getMetrics(),
+			 * phaseSpec.isStageLoggingEnabled(), phaseSpec.isProcessTimingEnabled());
+			 * PipelinePluginInstantiator pluginInstantiator = new
+			 * PipelinePluginInstantiator(context.getPluginContext(), context.getMetrics(),
+			 * phaseSpec, new SingleConnectorFactory());
+			 */
+
+			final PipelineRuntime pipelineRuntime = new PipelineRuntime(context.getNamespace(), "debug_pipeline",
+					context.getLogicalStartTime(), new BasicArguments(context.getRuntimeArguments()),
+					context.getMetrics(), context.getPluginContext(), context.getServiceDiscoverer(), null, null);
+			final Admin admin = context.getAdmin();
+
+			PipelinePhase phase = phaseSpec.getPhase();
+			// Collect field operations emitted by various stages in this MapReduce program
+			final Map<String, List<FieldOperation>> stageOperations = new HashMap<>();
+			// go through in topological order so that arguments set by one stage are seen
+			// by stages after it
+			for (final String stageName : phase.getDag().getTopologicalOrder()) {
+				final StageSpec stageSpec = phase.getStage(stageName);
+				String pluginType = stageSpec.getPluginType();
+				boolean isConnectorSource = Constants.Connector.PLUGIN_TYPE.equals(pluginType)
+						&& phase.getSources().contains(stageName);
+				boolean isConnectorSink = Constants.Connector.PLUGIN_TYPE.equals(pluginType)
+						&& phase.getSinks().contains(stageName);
+
+				SubmitterPlugin submitterPlugin = null;
+				if (BatchSource.PLUGIN_TYPE.equals(pluginType) || isConnectorSource) {
+
+					BatchConfigurable<BatchSourceContext> batchSource = pluginContext.newPluginInstance(stageName,
+							evaluator);
+					ContextProvider<BatchSourceContext> contextProvider = new ContextProvider<BatchSourceContext>() {
+						@Override
+						public BatchSourceContext getContext(DatasetContext datasetContext) {
+							return new SparkBatchSourceContext(sourceFactory, context, pipelineRuntime, datasetContext,
+									stageSpec);
+						}
+					};
+					submitterPlugin = new SubmitterPlugin(stageName, context, batchSource, contextProvider,
+							new SubmitterPlugin.PrepareAction<SparkBatchSourceContext>() {
+								@Override
+								public void act(SparkBatchSourceContext context) {
+									stageOperations.put(stageName, context.getFieldOperations());
+								}
+							});
+
+				} else if (Transform.PLUGIN_TYPE.equals(pluginType)) {
+
+					Transform transform = pluginContext.newPluginInstance(stageName, evaluator);
+					ContextProvider<StageSubmitterContext> contextProvider = new ContextProvider<StageSubmitterContext>() {
+						@Override
+						public StageSubmitterContext getContext(DatasetContext datasetContext) {
+							return new SparkBatchSourceContext(sourceFactory, context, pipelineRuntime, datasetContext,
+									stageSpec);
+						}
+					};
+					submitterPlugin = new SubmitterPlugin(stageName, context, transform, contextProvider,
+							new SubmitterPlugin.PrepareAction<SparkBatchSourceContext>() {
+								@Override
+								public void act(SparkBatchSourceContext context) {
+									stageOperations.put(stageName, context.getFieldOperations());
+								}
+							});
+
+				} else if (BatchSink.PLUGIN_TYPE.equals(pluginType) || isConnectorSink) {
+
+					BatchConfigurable<BatchSinkContext> batchSink = pluginContext.newPluginInstance(stageName,
+							evaluator);
+					ContextProvider<BatchSinkContext> contextProvider = new ContextProvider<BatchSinkContext>() {
+						@Override
+						public BatchSinkContext getContext(DatasetContext datasetContext) {
+							return new SparkBatchSinkContext(sinkFactory, context, pipelineRuntime, datasetContext,
+									stageSpec);
+						}
+					};
+					submitterPlugin = new SubmitterPlugin(stageName, context, batchSink, contextProvider,
+							new SubmitterPlugin.PrepareAction<SparkBatchSinkContext>() {
+								@Override
+								public void act(SparkBatchSinkContext context) {
+									stageOperations.put(stageName, context.getFieldOperations());
+								}
+							});
+
+				} else if (SparkSink.PLUGIN_TYPE.equals(pluginType)) {
+
+					BatchConfigurable<SparkPluginContext> sparkSink = pluginContext.newPluginInstance(stageName,
+							evaluator);
+					ContextProvider<SparkPluginContext> contextProvider = new ContextProvider<SparkPluginContext>() {
+						@Override
+						public SparkPluginContext getContext(DatasetContext datasetContext) {
+							return new BasicSparkPluginContext(null, pipelineRuntime, stageSpec, datasetContext, admin);
+						}
+					};
+					submitterPlugin = new SubmitterPlugin(stageName, context, sparkSink, contextProvider);
+
+				} else if (BatchAggregator.PLUGIN_TYPE.equals(pluginType)) {
+
+					BatchAggregator aggregator = pluginContext.newPluginInstance(stageName, evaluator);
+					ContextProvider<DefaultAggregatorContext> contextProvider = new AggregatorContextProvider(
+							pipelineRuntime, stageSpec, admin);
+					submitterPlugin = new SubmitterPlugin(stageName, context, aggregator, contextProvider,
+							new SubmitterPlugin.PrepareAction<DefaultAggregatorContext>() {
+								@Override
+								public void act(DefaultAggregatorContext context) {
+									stageOperations.put(stageName, context.getFieldOperations());
+								}
+							});
+
+				} else if (BatchJoiner.PLUGIN_TYPE.equals(pluginType)) {
+
+					BatchJoiner joiner = pluginContext.newPluginInstance(stageName, evaluator);
+					ContextProvider<DefaultJoinerContext> contextProvider = new JoinerContextProvider(pipelineRuntime,
+							stageSpec, admin);
+					submitterPlugin = new SubmitterPlugin<>(stageName, context, joiner, contextProvider,
+							new SubmitterPlugin.PrepareAction<DefaultJoinerContext>() {
+								@Override
+								public void act(DefaultJoinerContext sparkJoinerContext) {
+									stagePartitions.put(stageName, sparkJoinerContext.getNumPartitions());
+									stageOperations.put(stageName, sparkJoinerContext.getFieldOperations());
+								}
+							});
+
+				}
+				if (submitterPlugin != null) {
+					submitterPlugin.prepareRun();
+					finishers.add(submitterPlugin);
+				}
+			}
+
+			SparkBatchSourceSinkFactoryInfo sourceSinkInfo = new SparkBatchSourceSinkFactoryInfo(sourceFactory,
+					sinkFactory, stagePartitions);
+
+			properties.put("HydratorSpark.config", GSON.toJson(sourceSinkInfo));
+
+			/**
+			 * WorkflowToken token = (WorkflowToken) context.getWorkflowToken(); if (token
+			 * != null) { for (Map.Entry<String, String> entry :
+			 * pipelineRuntime.getArguments().getAddedArguments().entrySet()) {
+			 * token.put(entry.getKey(), entry.getValue()); } // Put the collected field
+			 * operations in workflow token
+			 * token.put(Constants.FIELD_OPERATION_KEY_IN_WORKFLOW_TOKEN,
+			 * GSON.toJson(stageOperations)); }
+			 */
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			throw new BadRequestException(
+					String.format("Problem in initilizing the plugins required for the pipeline '%s'. " + "Error: %s",
+							ex.getMessage()));
 		}
 
-		try {
-
-			pluginContext.usePlugin(BatchSink.PLUGIN_TYPE, "Table", "table_ds_otput_miraj",
-					PluginProperties.builder().add("schema",
-							"{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"orderid\",\"type\":[\"string\",\"null\"]},{\"name\":\"status\",\"type\":[\"string\",\"null\"]}]}")
-							.add("schema.row.field", "orderid").add("name", "miraj_ds1").build());
-//			pluginContext.newPluginInstance("table_ds_otput_miraj");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		
-*/
-		
-		
-		try {
-		
-		    List cleanupFiles = new ArrayList<>();
-		    List<Finisher> finishers = new ArrayList<>();
-		    SparkConf sparkConf = context.getSparkContext().getConf();
-		    
-		    BatchPhaseSpec phaseSpec = GSON.fromJson(properties.get(Constants.PIPELINEID), BatchPhaseSpec.class);
-
-		    for (Map.Entry<String, String> pipelineProperty : phaseSpec.getPipelineProperties().entrySet()) {
-		      sparkConf.set(pipelineProperty.getKey(), pipelineProperty.getValue());
-		    }
-
-		    MacroEvaluator evaluator = new DefaultMacroEvaluator(new BasicArguments(context.getRuntimeArguments()),
-		                                                         context.getLogicalStartTime(), context.getSecureStore(),
-		                                                         context.getNamespace());
-		    final SparkBatchSourceFactory sourceFactory = new SparkBatchSourceFactory();
-		    final SparkBatchSinkFactory sinkFactory = new SparkBatchSinkFactory();
-		    final Map<String, Integer> stagePartitions = new HashMap<>();
-//		    PluginContext pluginContext = new SparkPipelinePluginContext(context.getPluginContext(), context.getMetrics(),
-//		                                                                 phaseSpec.isStageLoggingEnabled(),
-//		                                                                 phaseSpec.isProcessTimingEnabled());
-//		    PipelinePluginInstantiator pluginInstantiator =
-//		      new PipelinePluginInstantiator(context.getPluginContext(), context.getMetrics(), phaseSpec, new SingleConnectorFactory());
-		    
-		    final PipelineRuntime pipelineRuntime = new PipelineRuntime(context.getNamespace(), "debug_pipeline" , context.getLogicalStartTime(), 
-		    		new BasicArguments(context.getRuntimeArguments()),
-		    		context.getMetrics(),  context.getPluginContext(), context.getServiceDiscoverer(),
-                     null, null);
-		    final Admin admin = context.getAdmin();
-
-		    PipelinePhase phase = phaseSpec.getPhase();
-		    // Collect field operations emitted by various stages in this MapReduce program
-		    final Map<String, List<FieldOperation>> stageOperations = new HashMap<>();
-		    // go through in topological order so that arguments set by one stage are seen by stages after it
-		    for (final String stageName : phase.getDag().getTopologicalOrder()) {
-		      final StageSpec stageSpec = phase.getStage(stageName);
-		      String pluginType = stageSpec.getPluginType();
-		      boolean isConnectorSource =
-		        Constants.Connector.PLUGIN_TYPE.equals(pluginType) && phase.getSources().contains(stageName);
-		      boolean isConnectorSink =
-		        Constants.Connector.PLUGIN_TYPE.equals(pluginType) && phase.getSinks().contains(stageName);
-
-		      SubmitterPlugin submitterPlugin = null;
-		      if (BatchSource.PLUGIN_TYPE.equals(pluginType) || isConnectorSource) {
-
-		        BatchConfigurable<BatchSourceContext> batchSource = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<BatchSourceContext> contextProvider =
-		          new ContextProvider<BatchSourceContext>() {
-		            @Override
-		            public BatchSourceContext getContext(DatasetContext datasetContext) {
-		              return new SparkBatchSourceContext(sourceFactory, context, pipelineRuntime, datasetContext, stageSpec);
-		            }
-		          };
-		        submitterPlugin = new SubmitterPlugin(stageName, context, batchSource, contextProvider,
-		                new SubmitterPlugin.PrepareAction<SparkBatchSourceContext>() {
-		          @Override
-		          public void act(SparkBatchSourceContext context) {
-		            stageOperations.put(stageName, context.getFieldOperations());
-		          }
-		        });
-
-		      } else if (Transform.PLUGIN_TYPE.equals(pluginType)) {
-
-		        Transform transform = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<StageSubmitterContext> contextProvider =
-		          new ContextProvider<StageSubmitterContext>() {
-		            @Override
-		            public StageSubmitterContext getContext(DatasetContext datasetContext) {
-		              return new SparkBatchSourceContext(sourceFactory, context, pipelineRuntime, datasetContext, stageSpec);
-		            }
-		          };
-		        submitterPlugin = new SubmitterPlugin(stageName, context, transform, contextProvider,
-		                new SubmitterPlugin.PrepareAction<SparkBatchSourceContext>() {
-		          @Override
-		          public void act(SparkBatchSourceContext context) {
-		            stageOperations.put(stageName, context.getFieldOperations());
-		          }
-		        });
-
-		      } else if (BatchSink.PLUGIN_TYPE.equals(pluginType) || isConnectorSink) {
-
-		        BatchConfigurable<BatchSinkContext> batchSink = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<BatchSinkContext> contextProvider = new ContextProvider<BatchSinkContext>() {
-		          @Override
-		          public BatchSinkContext getContext(DatasetContext datasetContext) {
-		            return new SparkBatchSinkContext(sinkFactory, context, pipelineRuntime, datasetContext, stageSpec);
-		          }
-		        };
-		        submitterPlugin = new SubmitterPlugin(stageName, context, batchSink, contextProvider,
-		                new SubmitterPlugin.PrepareAction<SparkBatchSinkContext>() {
-		          @Override
-		          public void act(SparkBatchSinkContext context) {
-		            stageOperations.put(stageName, context.getFieldOperations());
-		          }
-		        });
-
-		      } else if (SparkSink.PLUGIN_TYPE.equals(pluginType)) {
-
-		        BatchConfigurable<SparkPluginContext> sparkSink = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<SparkPluginContext> contextProvider =
-		          new ContextProvider<SparkPluginContext>() {
-		            @Override
-		            public SparkPluginContext getContext(DatasetContext datasetContext) {
-		              return new BasicSparkPluginContext(null, pipelineRuntime, stageSpec, datasetContext, admin);
-		            }
-		          };
-		        submitterPlugin = new SubmitterPlugin(stageName, context, sparkSink, contextProvider);
-
-		      } else if (BatchAggregator.PLUGIN_TYPE.equals(pluginType)) {
-
-		        BatchAggregator aggregator = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<DefaultAggregatorContext> contextProvider =
-		          new AggregatorContextProvider(pipelineRuntime, stageSpec, admin);
-		        submitterPlugin = new SubmitterPlugin(stageName, context, aggregator, contextProvider,
-		                new SubmitterPlugin.PrepareAction<DefaultAggregatorContext>() {
-		          @Override
-		          public void act(DefaultAggregatorContext context) {
-		            stageOperations.put(stageName, context.getFieldOperations());
-		          }
-		        });
-
-		      } else if (BatchJoiner.PLUGIN_TYPE.equals(pluginType)) {
-
-		        BatchJoiner joiner = pluginContext.newPluginInstance(stageName, evaluator);
-		        ContextProvider<DefaultJoinerContext> contextProvider =
-		          new JoinerContextProvider(pipelineRuntime, stageSpec, admin);
-		        submitterPlugin = new SubmitterPlugin<>(
-		          stageName, context, joiner, contextProvider,
-		          new SubmitterPlugin.PrepareAction<DefaultJoinerContext>() {
-		            @Override
-		            public void act(DefaultJoinerContext sparkJoinerContext) {
-		              stagePartitions.put(stageName, sparkJoinerContext.getNumPartitions());
-		              stageOperations.put(stageName, sparkJoinerContext.getFieldOperations());
-		            }
-		          });
-
-		      }
-		      if (submitterPlugin != null) {
-		        submitterPlugin.prepareRun();
-		        finishers.add(submitterPlugin);
-		      }
-		    }
-
-		    SparkBatchSourceSinkFactoryInfo sourceSinkInfo = new SparkBatchSourceSinkFactoryInfo(sourceFactory,
-		    		sinkFactory,
-		    		stagePartitions);
-
-		    properties.put("HydratorSpark.config",GSON.toJson(sourceSinkInfo) );
-
-//		    WorkflowToken token = (WorkflowToken) context.getWorkflowToken();
-//		    if (token != null) {
-//		      for (Map.Entry<String, String> entry : pipelineRuntime.getArguments().getAddedArguments().entrySet()) {
-//		        token.put(entry.getKey(), entry.getValue());
-//		      }
-//		      // Put the collected field operations in workflow token
-//		      token.put(Constants.FIELD_OPERATION_KEY_IN_WORKFLOW_TOKEN, GSON.toJson(stageOperations));
-//		    }
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw new BadRequestException(String.format(
-					"Problem in initilizing the plugins required for the pipeline '%s'. " + "Error: %s",
-					ex.getMessage()));
-		}
-		
-		//Run the pipeline in Batch spark piepeline driver
+		// Run the pipeline in Batch spark piepeline driver
 		try {
 			JavaSparkExecutionContext jse = context.toJavaSparkExecutionContext();
 			bspd.run(jse);
@@ -901,7 +850,6 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 					e1.getMessage()));
 		}
 
-		
 	}
 	
 	/**
