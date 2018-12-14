@@ -45,7 +45,7 @@
       <groupId>co.cask.cdap</groupId>
       <artifactId>cdap-api</artifactId>
       <version>${cdap.version}</version>
-      <scope>provided</scope>
+      <scope>provided</scope>  
     </dependency>
     <dependency>
       <groupId>co.cask.cdap</groupId>
@@ -64,6 +64,44 @@
       <version>${cdap.version}</version>
       <scope>provided</scope>
     </dependency>
+<dependency>
+     <groupId>co.cask.cdap</groupId>
+     <artifactId>hydrator-spark-core2_2.11</artifactId>
+     <version>${cdap.version}</version>
+   </dependency>
+<!--If app fabric jar is added to MMS there is an error in loading MMS, not sure why -->
+<!--<dependency>
+      <groupId>co.cask.cdap</groupId>
+      <artifactId>cdap-app-fabric</artifactId>
+      <version>${cdap.version}</version>
+      <scope>provided</scope>
+    </dependency>
+<dependency> 
+   <groupId>co.cask.hydrator</groupId>
+   <artifactId>core-plugins</artifactId>
+   <version>2.0.0</version>
+ </dependency>
+<dependency>
+      <groupId>co.cask.cdap</groupId>
+      <artifactId>cdap-data-pipeline</artifactId>
+      <version>${cdap.version}</version>
+    </dependency>
+<dependency>
+      <groupId>co.cask.cdap</groupId>
+      <artifactId>cdap-data-fabric</artifactId>
+      <version>${cdap.version}</version>
+    </dependency>
+
+<dependency>
+      <groupId>co.cask.cdap</groupId>
+      <artifactId>cdap-proto</artifactId>
+      <version>${cdap.version}</version>
+    </dependency>
+<dependency>
+   <groupId>co.cask.cdap</groupId>
+   <artifactId>cdap-unit-test</artifactId>
+   <version>${cdap.version}</version>
+ </dependency>-->
     <dependency>
       <groupId>co.cask.cdap</groupId>
       <artifactId>cdap-unit-test-spark2_2.11</artifactId>
@@ -118,7 +156,26 @@
             </manifest>
           </archive>
           <instructions>
-            <_exportcontents>co.cask.cdap.etl.api</_exportcontents>
+            <_exportcontents>
+            co.cask.cdap.etl.api;
+            co.cask.wrangler.*;
+              co.cask.cdap.etl.api.*;
+              co.cask.hydrator.plugin.alert.*;
+              co.cask.hydrator.plugin.batch.*;
+              co.cask.hydrator.plugin.common;
+              co.cask.hydrator.plugin.realtime.*;
+              co.cask.hydrator.plugin.streaming.*;
+              co.cask.hydrator.plugin.transform.*;
+              co.cask.hydrator.plugin.validator.*;
+              co.cask.hydrator.plugin.error.*;
+              org.apache.avro.mapred.*;
+              org.apache.avro.mapreduce;
+              org.apache.parquet.avro.*;
+              org.apache.parquet.hadoop.*;
+              org.apache.orc.*;
+              <!-- Used by S3 source/sink -->
+              org.apache.http.*
+              </_exportcontents>
             <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Embed-Directory>lib</Embed-Directory>

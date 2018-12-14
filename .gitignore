@@ -32,3 +32,16 @@ out/
 ./lib/
 .idea
 target/
+
+# Eclipse Files & Dir #
+build/
+.gradle/
+.stickyStorage
+.build/
+target/
+/target/
+*.classpath
+/*.project
+*.settings
+/*.springBeans
+*.project
