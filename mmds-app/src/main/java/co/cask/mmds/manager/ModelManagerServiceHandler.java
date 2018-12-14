@@ -696,7 +696,7 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 
 			final PipelineRuntime pipelineRuntime = new PipelineRuntime(context.getNamespace(), "debug_pipeline",
 					context.getLogicalStartTime(), new BasicArguments(context.getRuntimeArguments()),
-					context.getMetrics(), context.getPluginContext(), context.getServiceDiscoverer(), context.getJavaSparkContext(), null, null);
+					context.getMetrics(), context.getPluginContext(), context.getServiceDiscoverer(), null, null, null);
 			final Admin admin = context.getAdmin();
 
 			PipelinePhase phase = phaseSpec.getPhase();
