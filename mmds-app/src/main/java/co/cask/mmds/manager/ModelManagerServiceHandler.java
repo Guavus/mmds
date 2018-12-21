@@ -602,7 +602,7 @@ public class ModelManagerServiceHandler implements SparkHttpServiceHandler {
 
 	
 	@POST
-	@Path("/pipeline/run")
+	@Path("/experiments/run")
 	public void runPipeline(HttpServiceRequest request, HttpServiceResponder responder) {
 		ETLBatchConfig config = null;
 		BatchSparkPipelineDriver bspd = new BatchSparkPipelineDriver();
