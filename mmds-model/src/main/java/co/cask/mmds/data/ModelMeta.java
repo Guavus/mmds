@@ -40,7 +40,7 @@ public class ModelMeta extends Model {
   private final Set<String> categoricalFeatures;
   private final EvaluationMetrics evaluationMetrics;
 
-  private ModelMeta(String id, String name, String description, String algorithm, String split,
+  protected ModelMeta(String id, String name, String description, String algorithm, String split,
                     @Nullable String predictionsDataset, ModelStatus status, List<String> directives,
                     Map<String, String> hyperparameters, List<String> features, String outcome,
                     Set<String> categoricalFeatures, long createtime, long trainingtime, long trainedtime,
@@ -149,16 +149,16 @@ public class ModelMeta extends Model {
    * Builds Model Metadata
    */
   public static class Builder extends Model.Builder<Builder> {
-    private final String id;
-    private long createtime;
-    private long trainingtime;
-    private long trainedtime;
-    private long deploytime;
-    private String outcome;
-    private ModelStatus status;
+    protected final String id;
+    protected long createtime;
+    protected long trainingtime;
+    protected long trainedtime;
+    protected long deploytime;
+    protected String outcome;
+    protected ModelStatus status;
     protected List<String> features;
-    private Set<String> categoricalFeatures;
-    private EvaluationMetrics evaluationMetrics;
+    protected Set<String> categoricalFeatures;
+    protected EvaluationMetrics evaluationMetrics;
 
     public Builder(String id) {
       this.id = id;
