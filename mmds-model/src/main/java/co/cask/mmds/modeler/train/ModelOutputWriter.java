@@ -155,6 +155,16 @@ public class ModelOutputWriter {
     return location.toURI().getPath();
   }
 
+  public String createPath(String relativePath, boolean owrwrite) throws IOException {
+    Location location = baseLocation.append(relativePath);
+    if (!location.exists() || true == owrwrite) {
+        if (false == location.mkdirs()) {
+          throw new IllegalArgumentException(location + " - path creation failed (overwrite option - " + owrwrite);
+        }
+    }
+    return location.toURI().getPath();
+  }
+
   private void deleteComponent(ModelKey modelKey, String component) throws IOException {
     Location location = baseLocation.append(modelKey.getExperiment()).append(modelKey.getModel()).append(component);
     if (location.exists()) {
