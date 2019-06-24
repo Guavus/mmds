@@ -83,6 +83,10 @@
       <id>sonatype.snapshots</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <site>
+      <id>cask</id>
+      <url>http://cask.co</url>
+    </site>
   </distributionManagement>
 
   <repositories>
