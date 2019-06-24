@@ -75,15 +75,30 @@
   </properties>
 
   <distributionManagement>
-           <repository>
-               <id>central</id>
-               <url>http://artifacts.ggn.in.guavus.com:80/libs-release-local</url>
-           </repository>
-           <snapshotRepository>
-               <id>snapshots</id>
-               <url>http://artifacts.ggn.in.guavus.com:8081/artifactory/libs-snapshot-local</url>
-           </snapshotRepository>
+     <repository>
+       <id>central</id>
+       <url>http://artifacts.ggn.in.guavus.com:80/libs-release-local</url>
+     </repository>
+     <snapshotRepository>
+       <id>snapshots</id>
+       <url>http://artifacts.ggn.in.guavus.com:8081/artifactory/libs-snapshot-local</url>
+     </snapshotRepository>
   </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>guavus.release</id>
+      <url>http://artifacts.ggn.in.guavus.com:80/libs-release-local</url>
+    </repository>
+    <repository>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
