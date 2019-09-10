@@ -42,12 +42,12 @@
       <artifactId>mmds-model</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>co.cask.mmds</groupId>
       <artifactId>mmds-app</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -83,7 +83,7 @@
       <artifactId>cdap-etl-api-spark</artifactId>
       <version>${cdap.version}</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>co.cask.cdap</groupId>
       <artifactId>cdap-data-pipeline2_2.11</artifactId>
       <version>${cdap.version}</version>
@@ -109,7 +109,6 @@
           <groupId>co.cask.cdap</groupId>
           <artifactId>cdap-api-spark</artifactId>
         </exclusion>
-        <!-- exclude these since they contain commons-lang3, which conflicts with Spark's commons-lang3 -->
         <exclusion>
           <groupId>org.apache.hive</groupId>
           <artifactId>hive-exec</artifactId>
@@ -125,7 +124,7 @@
       <artifactId>cdap-spark-core2_2.11</artifactId>
       <version>${cdap.version}</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-mllib_2.11</artifactId>
@@ -178,7 +177,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>co.cask.wrangler</groupId>
       <artifactId>wrangler-transform</artifactId>
       <version>3.0.0</version>
@@ -189,7 +188,7 @@
           <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency>-->
   </dependencies>
 
   <build>
