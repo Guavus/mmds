@@ -23,7 +23,7 @@
   <parent>
     <groupId>co.cask.mmds</groupId>
     <artifactId>mmds</artifactId>
-    <version>1.1.1_5.1.217</version>
+    <version>1.1.1_5.1.216</version>
   </parent>
 
   <artifactId>mmds-app</artifactId>
